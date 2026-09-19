@@ -1,58 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Meculius - Tech AI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
-        h1 { color: #58a6ff; }
-        #chatbox { width: 100%; max-width: 600px; height: 65vh; border: 1px solid #30363d; border-radius: 10px; padding: 15px; overflow-y: auto; background-color: #161b22; margin-bottom: 20px; }
-        .message { margin: 10px 0; padding: 12px; border-radius: 8px; line-height: 1.5; font-size: 15px; }
-        .user-msg { background-color: #1f6feb; color: white; text-align: right; margin-left: 20%; }
-        .bot-msg { background-color: #21262d; text-align: left; border-left: 4px solid #3fb950; margin-right: 20%; }
-        #input-area { width: 100%; max-width: 600px; display: flex; gap: 10px; }
-        input { flex: 1; padding: 15px; border: 1px solid #30363d; border-radius: 8px; background-color: #0d1117; color: white; font-size: 16px; }
-        button { padding: 15px 20px; border: none; border-radius: 8px; background-color: #238636; color: white; font-weight: bold; cursor: pointer; font-size: 16px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meculius AI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; }
+    header { padding: 14px; background: #1e293b; text-align: center; font-size: 1.1rem; font-weight: bold; border-bottom: 2px solid #3b82f6; }
+    #chatbox { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { max-width: 90%; padding: 12px 14px; border-radius: 8px; line-height: 1.6; font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; }
+    .user { align-self: flex-end; background: #2563eb; color: #fff; }
+    .ai { align-self: flex-start; background: #1e293b; border-left: 4px solid #10b981; border: 1px solid #334155; }
+    footer { display: flex; padding: 10px; background: #1e293b; gap: 8px; }
+    input { flex: 1; padding: 12px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 1rem; outline: none; }
+    button { padding: 12px 18px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+  </style>
 </head>
 <body>
-    <h1>🤖 Meculius</h1>
-    <div id="chatbox"></div>
-    <div id="input-area">
-        <input type="text" id="userInput" placeholder="Ask anything about tech...">
-        <button onclick="sendMessage()">Send</button>
-    </div>
 
-    <script>
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const chatbox = document.getElementById('chatbox');
-            const text = input.value;
-            if (!text) return;
+  <header>⚡ Meculius AI</header>
+  <div id="chatbox">
+    <div class="msg ai">Namaste! Main <b>Meculius</b> hu, jise <b>Devansh Tripathi</b> ne banaya hai. Main internet se live research karke har sawal ka detailed aur deep jawab de sakta hu. Poochiye aapko kya janna hai!</div>
+  </div>
 
-            chatbox.innerHTML += `<div class="message user-msg">${text}</div>`;
-            input.value = '';
-            chatbox.scrollTop = chatbox.scrollHeight;
+  <footer>
+    <input type="text" id="userInput" placeholder="Meculius se kuch bhi poocho..." onkeydown="if(event.key==='Enter') sendMessage()">
+    <button onclick="sendMessage()">Send</button>
+  </footer>
 
-            chatbox.innerHTML += `<div class="message bot-msg" id="loading">Meculius is thinking...</div>`;
-            chatbox.scrollTop = chatbox.scrollHeight;
+  <script>
+    // Yahan apni Gemini API Key paste karo
+    const API_KEY = "APNI_GEMINI_API_KEY_YAHAN_DAALO";
 
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
-                const data = await response.json();
-                document.getElementById('loading').remove();
-                chatbox.innerHTML += `<div class="message bot-msg">${data.reply}</div>`;
-            } catch (err) {
-                document.getElementById('loading').remove();
-                chatbox.innerHTML += `<div class="message bot-msg">Error: Connection failed.</div>`;
-            }
-            chatbox.scrollTop = chatbox.scrollHeight;
-        }
-    </script>
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatbox = document.getElementById('chatbox');
+      chatbox.innerHTML += `<div class="msg user">${text}</div>`;
+      input.value = '';
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      const loadingMsg = document.createElement('div');
+      loadingMsg.className = 'msg ai';
+      loadingMsg.innerText = 'Meculius live web research kar raha hai... ⏳';
+      chatbox.appendChild(loadingMsg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      const prompt = `
+      Tumhara naam Meculius hai. Tum ek highly advanced, smart aur intellectual AI ho.
+      RULES:
+      1. Agar koi puche 'Who is your creator?', 'Tumhe kisne banaya?', ya creator ke baare me puche, toh proudly aur strictly kaho: 'Mujhe Devansh Tripathi ne banaya hai.'
+      2. Hamesha latest web research (Google Search) ka use karke accurate aur up-to-date jawab do.
+      3. Jawab hamesha kaafi detailed, lamba, well-structured (headings aur bullet points ke sath), aur deeply explained hona chahiye. Chota 5-10 line ka answer bilkul mat dena.
+      User sawal: ${text}
+      `;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            tools: [{ google_search: {} }]
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Jawab generate nahi ho paya, kripya dubara try karein.";
+        loadingMsg.innerText = reply;
+      } catch (err) {
+        loadingMsg.innerText = "Error: " + err.message;
+      }
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
 </body>
-  </html>
-  
+</html>
